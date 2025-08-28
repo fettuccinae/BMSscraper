@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}All Notifications{% endblock %}</h1>
+  {% if g.user %}
+    <a class="action" href="{{ url_for('tix.add_event') }}">Create NEW notification EVENTS</a>
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+    {% if notifications is not none and notifications|length > 0 %}
+        {% for notification in notifications %}
+      
+        <ul>
+        <li><strong>ID:</strong> {{ notification.rem_id }}</li>
+        <li><strong>User ID:</strong> {{ notification.user_id }}</li>
+        <li><strong>Event detail: {{ notification.detail }}</strong></li>
+        <li><strong>Scrape URL:</strong>
+            <a href="{{ notification.scrape_url }}" target="_blank">{{ notification.scrape_url }}</a>
+        </li>
+        <li><strong>Last update:</strong> {{ notification.last_check_time }}</li>
+        <li><strong>Notification Sent:</strong>{{ notification.notification_sent }}</li>
+
+        <li><strong>Scrape Option:</strong> {{ notification.scrape_option }}</li>
+        <li><strong>Check From:</strong>
+            {% if notification.check_from_time %}
+            {{ notification.check_from_time }}
+            {% else %}
+            —
+            {% endif %}
+        </li>
+        <li><strong>Check Till:</strong>
+            {% if notification.check_till_time %}
+            {{ notification.check_till_time }}
+            {% else %}
+            —
+            {% endif %}
+        </li>
+        <li><strong>Frequency (hours):</strong>
+            {{ notification.notification_frequency }}
+        </li>
+        <li><strong>Created At:</strong>
+            {{ notification.created_at }}
+        </li>
+        </ul>
+        {% endfor %}
+
+    {% else %}
+        <p>No notification found.</p>
+    {% endif %}
+
+
+{% endblock %}

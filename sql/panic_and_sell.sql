@@ -1,0 +1,2 @@
+DROP DATABASE webapp;
+DROP USER webapp;

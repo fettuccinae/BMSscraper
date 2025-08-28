@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block header %}
+  <h1>{% block title %}Add notification events{% endblock %}</h1>
+  {% if g.user %}
+    <a class="action" href="{{ url_for('tix.index') }}">Check Existing Notifications</a>
+  {% endif %}
+{% endblock %}
+
+
+{% block content %}
+<h2>Add Event to Track</h2>
+<form method="post" action="{{ url_for('tix.add_event') }}">
+  
+  
+  <div>
+    <label for="scrape_url">Event URL:</label>
+    <input type="url" id="scrape_url" name="scrape_url" placeholder = "https://in.bookmyshow.com/movies/hyderabad/jurassic-world-rebirth/ET00432498"required>
+  </div>
+
+  <div>
+    <label for="scrape_option">What to Track:</label>
+    <select id="scrape_option" name="scrape_option" required>
+      <option value="movie">Track movie availability (enter movie URL)</option>
+      <option value="tickets">Track slots in Prasads (enter ticket page URL)</option>
+    </select>
+  </div>
+
+  <div>
+    <label for="frequency">Scraping Frequency:</label>
+    <select id="frequency" name="frequency" required>
+      <option value="1">Every 1 hour</option>
+      <option value="12">Every 12 hours</option>
+      <option value="24">Every 1 day</option>
+      <option value="168">Every 7 days</option>
+    </select>
+  </div>
+
+  <!-- <div>
+    <label for="from_time">Check From:</label>
+    <input type="time" id="from_time" name="from_time" required>
+  </div>
+  <div>
+    <label for="till_time">Check Till:</label>
+    <input type="time" id="till_time" name="till_time" required>
+  </div> -->
+
+  <div>
+    <button type="submit">Add Notification Event(It may take a minute to scrape, please wait after clicking this button.)</button>
+  </div>
+</form>
+{% endblock %}
