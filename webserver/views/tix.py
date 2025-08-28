@@ -36,11 +36,7 @@ def add_event():
         if not url or not option or not frequency:
             flash("Please select errthing")
 
-        elif (
-            option not in ("tickets", "movie")
-            or re.search(r"(https:\/\/in\.bookmyshow\.com\/movies\/hyderabad)(.*)", url).group(1)
-            != "https://in.bookmyshow.com/movies/hyderabad"
-        ):
+        elif option not in ("tickets", "movie"):
             flash("what the helli")
 
         else:
@@ -50,7 +46,7 @@ def add_event():
                 detail = scrape(notification["scrape_url"], notification["scrape_option"])
                 add_notification_detail(notification["rem_id"], detail)
                 if detail["available"] is True:
-                    name = re.search(r"(.*\/hyderabad\/)([^\/]+)(\/.*)", url).group(2)
+                    name = re.search(r"(.*\/((vijaywada\/)|(hyderabad\/)))([^\/]+)(\/.*)", url).group(5)
                     send_mail(
                         f"Update for {name} in BMS", json.dumps(detail), notification["mail_id"]
                     )
