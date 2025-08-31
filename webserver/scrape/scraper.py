@@ -3,20 +3,24 @@ from .parser import fuckOOP
 from flask import current_app
 
 
-def scrape(url: str, option: str) -> dict:
+def scrape(tix_urls: list[tuple], movie_urls: list[tuple]) -> tuple[list[dict], list[bool]]:
     with SB(uc=True, locale="en", xvfb=True, headless=True) as sb:
         parser = fuckOOP()
+        slot_list = []
+        available_list = []
+        for t_url in tix_urls:
+            sb.activate_cdp_mode(t_url[1])
+            sb.sleep(2.1)
+            slot_list.append((t_url[0], get_prasad_slots(sb, parser)))
 
-        sb.activate_cdp_mode(url)
-        sb.sleep(2.1)
-        source_code = sb.cdp.get_page_source()
-        if option == "movie":
-            available = parser.check_if_movie_available(source_code)
-            return {"available": available}
+        for m_url in movie_urls:
+            sb.sleep(2.2)
+            sb.activate_cdp_mode(m_url)
+            sb.cdp.get_page_source()
 
-        else:
-            # do_all_shenanigans_and_land_on_booking_page(sb)
-            return get_prasad_slots(sb, parser)
+            available_list.append((m_url[0], parser.check_if_movie_available()))
+
+        return (slot_list, available_list)
 
 
 # def do_all_shenanigans_and_land_on_booking_page(sb, fourD=False):

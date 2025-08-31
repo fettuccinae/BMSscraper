@@ -16,6 +16,8 @@ from webserver.db.user import (
     add_new_notification_event,
     get_user_notifications,
     add_notification_detail,
+    i_run_through_them_all,
+    update_notifications,
 )
 from webserver.scrape.scraper import scrape
 from webserver.mail import send_mail
@@ -43,7 +45,12 @@ def add_event():
             try:
                 notification = add_new_notification_event(g.user["id"], url, option, frequency)
 
-                detail = scrape(notification["scrape_url"], notification["scrape_option"])
+                # too lazy to think here.
+                if notification["scrape_option"] == "tickets":
+                    detail = scrape([(None, notification["scrape_url"])], None)
+                else:
+                    detail = scrape(None, [(None, notification["scrape_url"])])
+
                 add_notification_detail(notification["rem_id"], detail)
                 if detail["available"] is True:
                     name = re.search(r"(.*\/((vijaywada\/)|(hyderabad\/)))([^\/]+)(\/.*)", url).group(5)
@@ -76,7 +83,17 @@ def cron():
     if not secret or secret != current_app.config["CRON_SECRET"]:
         return jsonify({"status": "nah"}), 401
     else:
-        run_hourly_job()
+        hemdilla = i_run_through_them_all(request.args.get("frequency"))
+        tix_urls = []
+        movie_urls = []
+        for u in hemdilla:
+            if u["scrape_option"] == "movie":
+                movie_urls.append((u["rem_id"], u["scrape_url"], u["detail"]))
+            else:
+                tix_urls.append((u["rem_id"], u["scrape_url"], u["detail"]))
+
+        new_shit_1, new_shit_2 = scrape(tix_urls, movie_urls)
+        update_notifications(new_shit_1, new_shit_2)
         return jsonify({"status": "aight"})
 
 

@@ -77,3 +77,19 @@ def add_notification_detail(rem_id: int, detail: dict) -> dict:
         conn.execute(
             query, {"detail": detail, "time": datetime.now(timezone.utc), "rem_id": rem_id}
         )
+
+
+def i_run_through_them_all(frequency: int) -> dict:
+
+    time_rn = datetime.now(timezone.utc)
+    delta = f"{frequency} hour"
+    query = text("SELECT * FROM user_notification WHERE  :time_rn + :delta >= last_check_time")
+    with db.engine.connect() as conn:
+        res = conn.execute(query, {"time_rn": time_rn, "delta": delta})
+        return res.mappings().fetchall()
+    
+def update_notifications(list_of_tuples_for_tickets: list[tuple[int, dict]], list_of_tuples_for_movies: list[tuple[int, bool]]):
+    params1 = []
+    for i in list_of_tuples_for_tickets:
+        if i[1] is not None:
+            params1.append({"id": i[0], "slots": i[1]})

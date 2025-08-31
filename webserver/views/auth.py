@@ -32,7 +32,7 @@ def registeration():
             try:
                 register_user(user_name, generate_password_hash(password))
                 flash("SUCCESSFULLY REGISTERED")
-                return redirect(url_for("auth.login"))
+                return redirect(_send_the_boy_home(user_name))
 
             except Exception as err:
                 current_app.logger.error(f"db error{err}")
@@ -56,14 +56,16 @@ def login():
         elif not check_password_hash(user["password_hash"], password):
             error = "WRONG PASSWORD MY"
         else:
-            session.clear()
-            session["user_name"] = user["user_name"]
-            return redirect(url_for("tix.index"))
+            return redirect(_send_the_boy_home(user["user_name"]))
         
         flash(error)
     
     return render_template("auth/login.html")
 
+def _send_the_boy_home(user_name):
+    session.clear()
+    session["user_name"] = user_name
+    return (url_for("tix.index"))
 
 @login_required
 @auth_bp.get("/logout")
