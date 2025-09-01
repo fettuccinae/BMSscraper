@@ -21,9 +21,15 @@ def send_mail(subject, body, user_email):
 
 def cron_job_mail_sending(data):
     for d in data:
-        name = re.search(
-            r"(.*\/((vijaywada\/)|(hyderabad\/)))([^\/]+)(\/.*)", d["scrape_url"]
-        ).group(5)
+        try:
+            name = re.search(
+                r"(.*\/((vijaywada\/)|(hyderabad\/)))([^\/]+)(\/.*)", d["scrape_url"]
+            ).group(5)
+
+        except Exception as error:
+            current_app.logger.error(d["scrape_url"] + error)
+            continue
+
         subject = f"Update for {name}"
         body = (
             str(d["detail"])
