@@ -54,7 +54,7 @@ def add_event():
 
                 add_notification_detail(notification["rem_id"], detail)
                 if detail.get("available") is True:
-                    name = re.search(r"(.*\/((vijaywada\/)|(hyderabad\/)))([^\/]+)(\/.*)", url).group(5)
+                    name = re.search(r"(.*\/((vijayawada\/)|(hyderabad\/)))([^\/]+)(\/.*)", url).group(5)
                     send_mail(
                         f"Update for {name} in BMS", json.dumps(detail), notification["mail_id"]
                     )

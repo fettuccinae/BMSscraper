@@ -23,7 +23,7 @@ def cron_job_mail_sending(data):
     for d in data:
         try:
             name = re.search(
-                r"(.*\/((vijaywada\/)|(hyderabad\/)))([^\/]+)(\/.*)", d["scrape_url"]
+                r"(.*\/((vijayawada\/)|(hyderabad\/)))([^\/]+)(\/.*)", d["scrape_url"]
             ).group(5)
 
         except Exception as error:
