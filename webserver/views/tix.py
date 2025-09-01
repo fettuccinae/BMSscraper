@@ -53,6 +53,8 @@ def add_event():
                     detail = scrape(None, [(None, notification["scrape_url"])])
 
                 add_notification_detail(notification["rem_id"], detail)
+
+                # life saving condition lmao.
                 if detail.get("available") is True:
                     name = re.search(r"(.*\/((vijayawada\/)|(hyderabad\/)))([^\/]+)(\/.*)", url).group(5)
                     send_mail(
@@ -90,13 +92,19 @@ def cron():
         # this was sending empty lists everywhere around till like the last one. phew
         tix_urls = []
         movie_urls = []
+        current_app.logger.info(hemdilla)
         for u in hemdilla:
             if u["scrape_option"] == "movie":
                 movie_urls.append((u["rem_id"], u["scrape_url"]))
             else:
                 tix_urls.append((u["rem_id"], u["scrape_url"]))
+        print(tix_urls)
+        print(movie_urls)
 
         new_shit_1, new_shit_2 = scrape(tix_urls, movie_urls)
+        print(new_shit_1)
+        print(new_shit_2)
+        
         rem_ids_for_updated_ones = update_notifications(new_shit_1, new_shit_2)
         mailing_data = get_notifications_by_rem_ids(rem_ids_for_updated_ones)
         cron_job_mail_sending(mailing_data)

@@ -119,8 +119,10 @@ def update_notifications(list_of_tuples_for_tickets: list[tuple[int, dict]], lis
             res = conn.execute(query, {"yeah": json.dumps(i[1]), "id": i[0]})
             real_ones.append(res.scalar())
 
-        for j in list_of_tuples_for_movies:
-            res = conn.execute(query, {"yeah": json.dumps({"available": i[1]}), "id": j[0]})
+        for j in (
+            list_of_tuples_for_movies
+        ):  # there might be a good reason to not use single name variables. maybe bugs.
+            res = conn.execute(query, {"yeah": json.dumps({"available": j[1]}), "id": j[0]})
             real_ones.append(res.scalar())
 
         conn.commit()

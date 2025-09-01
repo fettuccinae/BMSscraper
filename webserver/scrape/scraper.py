@@ -9,6 +9,7 @@ def scrape(tix_urls: list[tuple], movie_urls: list[tuple]) -> tuple[list[dict], 
         slot_list = []
         available_list = []
         sb.activate_cdp_mode()
+        
         for t_url in tix_urls:
             sb.cdp.open(t_url[1])
             sb.sleep(2.1)
