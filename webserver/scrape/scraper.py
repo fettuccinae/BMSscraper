@@ -4,21 +4,23 @@ from flask import current_app
 
 
 def scrape(tix_urls: list[tuple], movie_urls: list[tuple]) -> tuple[list[dict], list[bool]]:
+    print(tix_urls, movie_urls)
     with SB(uc=True, locale="en", xvfb=True, headless=True) as sb:
         parser = fuckOOP()
         slot_list = []
         available_list = []
+        sb.activate_cdp_mode()
         for t_url in tix_urls:
-            sb.activate_cdp_mode(t_url[1])
+            sb.cdp.open(t_url[1])
             sb.sleep(2.1)
             slot_list.append((t_url[0], get_prasad_slots(sb, parser)))
 
         for m_url in movie_urls:
             sb.sleep(2.2)
-            sb.activate_cdp_mode(m_url)
-            sb.cdp.get_page_source()
+            sb.cdp.open(m_url[1])
+            source = sb.cdp.get_page_source()
 
-            available_list.append((m_url[0], parser.check_if_movie_available()))
+            available_list.append((m_url[0], parser.check_if_movie_available(source)))
 
         return (slot_list, available_list)
 
@@ -64,7 +66,7 @@ def get_prasad_slots(sb: SB, parser: fuckOOP):
             else:
                 sb.cdp.click(f'//div[id="{next_date}"]')
 
-        except Exception:
-            break
+        except Exception as err:
+            current_app.logger.error(err)
 
     return dih

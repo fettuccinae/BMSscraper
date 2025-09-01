@@ -3,7 +3,7 @@ services:
     build:
       context: .
       dockerfile: dockerfile
-    command: gunicorn -w 1 --threads 4 --bind 0.0.0.0:8080 --log-level debug "webserver:create_app()"
+    command: python3 manage.py runserver --port 8080 --debug
     volumes:
       - .:/code/webapp
     depends_on:
@@ -32,6 +32,8 @@ services:
       - pg_data:/var/lib/postgresql/data
     environment:
       POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
     expose:
       - "5432"
 

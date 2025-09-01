@@ -17,7 +17,7 @@ class fuckOOP:
         all_intersting_shit = lxed_html.xpath(f'//div[@class="{theatres_and_times}"]')
         shit_we_need = self.find_shit_and_return_subtree(all_intersting_shit, t_name)
 
-        available_slots = self.return_all_times(shit_we_need, time_class) if len(shit_we_need) else None
+        available_slots = self.return_all_times(shit_we_need, time_class) if shit_we_need is not None else None
         next_date = self.next_date_or_nah(lxed_html, dates_pane, active_dates_pane, curr_date)
 
         return {"slots": available_slots, "next_date": next_date}

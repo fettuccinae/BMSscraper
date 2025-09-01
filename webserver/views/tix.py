@@ -18,9 +18,10 @@ from webserver.db.user import (
     add_notification_detail,
     i_run_through_them_all,
     update_notifications,
+    get_notifications_by_rem_ids,
 )
 from webserver.scrape.scraper import scrape
-from webserver.mail import send_mail
+from webserver.mail import send_mail, cron_job_mail_sending
 
 tix_bp = Blueprint("tix", __name__)
 
@@ -52,7 +53,7 @@ def add_event():
                     detail = scrape(None, [(None, notification["scrape_url"])])
 
                 add_notification_detail(notification["rem_id"], detail)
-                if detail["available"] is True:
+                if detail.get("available") is True:
                     name = re.search(r"(.*\/((vijaywada\/)|(hyderabad\/)))([^\/]+)(\/.*)", url).group(5)
                     send_mail(
                         f"Update for {name} in BMS", json.dumps(detail), notification["mail_id"]
@@ -88,12 +89,15 @@ def cron():
         movie_urls = []
         for u in hemdilla:
             if u["scrape_option"] == "movie":
-                movie_urls.append((u["rem_id"], u["scrape_url"], u["detail"]))
+                movie_urls.append((u["rem_id"], u["scrape_url"]))
             else:
-                tix_urls.append((u["rem_id"], u["scrape_url"], u["detail"]))
+                tix_urls.append((u["rem_id"], u["scrape_url"]))
 
         new_shit_1, new_shit_2 = scrape(tix_urls, movie_urls)
-        update_notifications(new_shit_1, new_shit_2)
+        rem_ids_for_updated_ones = update_notifications(new_shit_1, new_shit_2)
+        mailing_data = get_notifications_by_rem_ids(rem_ids_for_updated_ones)
+        cron_job_mail_sending(mailing_data)
+
         return jsonify({"status": "aight"})
 
 
