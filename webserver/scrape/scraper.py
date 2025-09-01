@@ -19,7 +19,7 @@ def scrape(tix_urls: list[tuple], movie_urls: list[tuple]) -> tuple[list[dict], 
             sb.sleep(2.2)
             sb.cdp.open(m_url[1])
             source = sb.cdp.get_page_source()
-
+            
             available_list.append((m_url[0], parser.check_if_movie_available(source)))
 
         return (slot_list, available_list)

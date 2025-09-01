@@ -120,7 +120,7 @@ def update_notifications(list_of_tuples_for_tickets: list[tuple[int, dict]], lis
             real_ones.append(res.scalar())
 
         for j in list_of_tuples_for_movies:
-            res = conn.execute(query, {"yeah": json.dumps({"available": True}), "id": j[0]})
+            res = conn.execute(query, {"yeah": json.dumps({"available": i[1]}), "id": j[0]})
             real_ones.append(res.scalar())
 
         conn.commit()
