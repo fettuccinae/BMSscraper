@@ -85,6 +85,9 @@ def cron():
         return jsonify({"status": "nah"}), 401
     else:
         hemdilla = i_run_through_them_all(request.args.get("frequency"))
+        if not hemdilla:
+            return jsonify({"status": "aight"})
+        # this was sending empty lists everywhere around till like the last one. phew
         tix_urls = []
         movie_urls = []
         for u in hemdilla:

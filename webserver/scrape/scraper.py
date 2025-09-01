@@ -4,7 +4,6 @@ from flask import current_app
 
 
 def scrape(tix_urls: list[tuple], movie_urls: list[tuple]) -> tuple[list[dict], list[bool]]:
-    print(tix_urls, movie_urls)
     with SB(uc=True, locale="en", xvfb=True, headless=True) as sb:
         parser = fuckOOP()
         slot_list = []
