@@ -24,9 +24,9 @@ def cron_job_mail_sending(data):
         name = re.search(
             r"(.*\/((vijaywada\/)|(hyderabad\/)))([^\/]+)(\/.*)", d["scrape_url"]
         ).group(5)
-        subject = f"Change for {name} EVENT"
+        subject = f"Update for {name}"
         body = (
             str(d["detail"])
-            + "\nIf you still want to track this event, please go on website and add it again. (Too lazy to think what to do for this condition)"
+            + "\n Server has now stopped tracking this event. If you want to keep tracking this event, please go on website and add it again. (Too lazy to think what to do for this condition)"
         )
         send_mail(subject, body, d["mail_id"])

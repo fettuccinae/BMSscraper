@@ -83,7 +83,7 @@ def i_run_through_them_all(frequency: int) -> dict:
 
     time_rn = datetime.now(timezone.utc)
     delta = f"{frequency} hour"
-    query = text("SELECT * FROM user_notification WHERE  :time_rn + :delta >= last_check_time")
+    query = text("SELECT * FROM user_notification WHERE  :time_rn + :delta >= last_check_time AND notification_sent = false")
     with db.engine.connect() as conn:
         res = conn.execute(query, {"time_rn": time_rn, "delta": delta})
         return res.mappings().fetchall()
