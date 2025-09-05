@@ -1,7 +1,7 @@
 from lxml.html import fromstring
 
 
-class fuckOOP:
+class parserService:
     def prasads_2d_slots(self, html_content, curr_url) -> dict:
         lxed_html = fromstring(html_content)
 
@@ -48,3 +48,10 @@ class fuckOOP:
             if int(next_date) > curr_date:
                 return int(next_date)
         return None
+
+    def is_popular_page(self, source):
+        res = fromstring(source).xpath('//*[text()="Popular Cities"]')
+        if len(res) == 0:
+            return False
+        else:
+            return True

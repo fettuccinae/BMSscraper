@@ -1,17 +1,32 @@
 from seleniumbase import SB
-from .parser import fuckOOP
+from .parser import parserService
 from flask import current_app
 
 
 def scrape(tix_urls: list[tuple], movie_urls: list[tuple]) -> tuple[list[dict], list[bool]]:
     with SB(uc=True, locale="en", xvfb=True, headless=True) as sb:
-        parser = fuckOOP()
+        parser = parserService()
         slot_list = []
         available_list = []
         sb.activate_cdp_mode()
         
         for t_url in tix_urls:
             sb.cdp.open(t_url[1])
+            source = sb.cdp.get_page_source()
+            tries = 0
+            while tries < 11:
+                if not parser.is_popular_page(source):
+                    break
+                sb.sleep(2.4)
+                sb.cdp.open(t_url[1])
+                source = sb.cdp.get_page_source()
+                tries+=1
+            
+            if tries >= 11:
+                current_app.logger.error(f"Thi shi is creating problems{t_url[0]}")
+                continue
+
+
             sb.sleep(2.1)
             slot_list.append((t_url[0], get_prasad_slots(sb, parser)))
 
@@ -19,6 +34,18 @@ def scrape(tix_urls: list[tuple], movie_urls: list[tuple]) -> tuple[list[dict], 
             sb.sleep(2.2)
             sb.cdp.open(m_url[1])
             source = sb.cdp.get_page_source()
+            tries = 0
+            while tries < 11:
+                if not parser.is_popular_page(source):
+                    break
+                sb.sleep(2.4)
+                sb.cdp.open(m_url[1])
+                source = sb.cdp.get_page_source()
+                tries+=1
+            
+            if tries >= 11:
+                current_app.logger.error(f"Thi shi is creating problems{m_url[0]}")
+                continue
             
             available_list.append((m_url[0], parser.check_if_movie_available(source)))
 
@@ -45,7 +72,7 @@ def scrape(tix_urls: list[tuple], movie_urls: list[tuple]) -> tuple[list[dict], 
 #         current_app.logger.info("NO option")
 
 
-def get_prasad_slots(sb: SB, parser: fuckOOP):
+def get_prasad_slots(sb: SB, parser: parserService):
     dih = {"available": True}
 
     while True:
