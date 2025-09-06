@@ -17,8 +17,8 @@ def scrape(tix_urls: list[tuple], movie_urls: list[tuple]) -> tuple[list[dict], 
             while tries < 11:
                 if not parser.is_popular_page(source):
                     break
-                sb.sleep(2.4)
                 sb.cdp.open(t_url[1])
+                sb.sleep(2.4)
                 source = sb.cdp.get_page_source()
                 tries+=1
             
@@ -31,15 +31,15 @@ def scrape(tix_urls: list[tuple], movie_urls: list[tuple]) -> tuple[list[dict], 
             slot_list.append((t_url[0], get_prasad_slots(sb, parser)))
 
         for m_url in movie_urls:
-            sb.sleep(2.2)
             sb.cdp.open(m_url[1])
+            sb.sleep(2.2)
             source = sb.cdp.get_page_source()
             tries = 0
             while tries < 11:
                 if not parser.is_popular_page(source):
                     break
-                sb.sleep(2.4)
                 sb.cdp.open(m_url[1])
+                sb.sleep(2.4)
                 source = sb.cdp.get_page_source()
                 tries+=1
             
