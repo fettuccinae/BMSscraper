@@ -11,6 +11,8 @@ from flask import (
 )
 import re
 import json
+import threading
+
 from webserver.decorators import login_required
 from webserver.db.user import (
     add_new_notification_event,
@@ -101,6 +103,14 @@ def cron():
         print(tix_urls)
         print(movie_urls)
 
+        thread = threading.Thread(target=_the_slow_part, args=(tix_urls, movie_urls))
+        thread.start()
+
+        return jsonify({"status": "aight"})
+
+
+def _the_slow_part(tix_urls, movie_urls):
+        
         new_shit_1, new_shit_2 = scrape(tix_urls, movie_urls)
         print(new_shit_1)
         print(new_shit_2)
@@ -108,8 +118,6 @@ def cron():
         rem_ids_for_updated_ones = update_notifications(new_shit_1, new_shit_2)
         mailing_data = get_notifications_by_rem_ids(rem_ids_for_updated_ones)
         cron_job_mail_sending(mailing_data)
-
-        return jsonify({"status": "aight"})
 
 
 def _convert_string_time_to_int(time: str) -> int:
