@@ -105,7 +105,7 @@ def cron():
 
 
         app = current_app._get_current_object()
-        def run_the_slow_part_in_context():
+        def run_the_slow_part_in_context(tix_urls, movie_urls):
             with app.app_context(tix_urls, movie_urls):
                 _the_slow_part(tix_urls, movie_urls)
 
