@@ -12,7 +12,7 @@ from flask import (
 import re
 import json
 import threading
-
+from webserver import create_app
 from webserver.decorators import login_required
 from webserver.db.user import (
     add_new_notification_event,
@@ -103,11 +103,11 @@ def cron():
         print(tix_urls)
         print(movie_urls)
 
-        thread = threading.Thread(target=_the_slow_part, args=(tix_urls, movie_urls))
-        thread.start()
+        with create_app().app_context():
+            thread = threading.Thread(target=_the_slow_part, args=(tix_urls, movie_urls))
+            thread.start()
 
         return jsonify({"status": "aight"})
-
 
 def _the_slow_part(tix_urls, movie_urls):
         
