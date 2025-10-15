@@ -109,7 +109,7 @@ def cron():
             with app.app_context():
                 _the_slow_part(tix_urls, movie_urls)
 
-        thread = threading.Thread(target=run_the_slow_part_in_context, args=(tix_urls, movie_urls))
+        thread = threading.Thread(target=run_the_slow_part_in_context)
         thread.start()
 
         return jsonify({"status": "aight"})
