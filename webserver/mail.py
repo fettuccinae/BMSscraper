@@ -2,13 +2,15 @@ import re
 import smtplib
 import ssl
 from email.message import EmailMessage
-from flask import current_app
+import os
 
+SERVER_USERNAME = os.environ.get("SERVER_USERNAME")
+SERVER_PASSWORD = os.environ.get("SERVER_PASSWORD")
 
 def send_mail(subject, body, user_email):
     with smtplib.SMTP(host="in-v3.mailjet.com", port=587) as mailer:
         mailer.starttls(context=ssl.create_default_context())
-        mailer.login(current_app.config["SERVER_USERNAME"], current_app.config["SERVER_PASSWORD"])
+        mailer.login(SERVER_USERNAME, SERVER_PASSWORD)
 
         msg = EmailMessage()
         msg.set_content(body)
@@ -27,7 +29,7 @@ def cron_job_mail_sending(data):
             ).group(5)
 
         except Exception as error:
-            current_app.logger.error(d["scrape_url"] + error)
+            print(d["scrape_url"] + error)
             continue
 
         subject = f"Update for {name}"
