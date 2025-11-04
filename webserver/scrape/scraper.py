@@ -1,22 +1,55 @@
 from seleniumbase import SB
-from .parser import fuckOOP
+from .parser import parserService
 from flask import current_app
 
 
-def scrape(url: str, option: str) -> dict:
+def scrape(tix_urls: list[tuple], movie_urls: list[tuple]) -> tuple[list[dict], list[bool]]:
     with SB(uc=True, locale="en", xvfb=True, headless=True) as sb:
-        parser = fuckOOP()
+        parser = parserService()
+        slot_list = []
+        available_list = []
+        sb.activate_cdp_mode()
+        
+        for t_url in tix_urls:
+            sb.cdp.open(t_url[1])
+            source = sb.cdp.get_page_source()
+            tries = 0
+            while tries < 11:
+                if not parser.is_popular_page(source):
+                    break
+                sb.cdp.open(t_url[1])
+                sb.sleep(2.4)
+                source = sb.cdp.get_page_source()
+                tries+=1
+            
+            if tries >= 11:
+                current_app.logger.error(f"Thi shi is creating problems{t_url[0]}")
+                continue
 
-        sb.activate_cdp_mode(url)
-        sb.sleep(2.1)
-        source_code = sb.cdp.get_page_source()
-        if option == "movie":
-            available = parser.check_if_movie_available(source_code)
-            return {"available": available}
 
-        else:
-            # do_all_shenanigans_and_land_on_booking_page(sb)
-            return get_prasad_slots(sb, parser)
+            sb.sleep(2.1)
+            slot_list.append((t_url[0], get_prasad_slots(sb, parser)))
+
+        for m_url in movie_urls:
+            sb.cdp.open(m_url[1])
+            sb.sleep(2.2)
+            source = sb.cdp.get_page_source()
+            tries = 0
+            while tries < 11:
+                if not parser.is_popular_page(source):
+                    break
+                sb.cdp.open(m_url[1])
+                sb.sleep(2.4)
+                source = sb.cdp.get_page_source()
+                tries+=1
+            
+            if tries >= 11:
+                current_app.logger.error(f"Thi shi is creating problems{m_url[0]}")
+                continue
+            
+            available_list.append((m_url[0], parser.check_if_movie_available(source)))
+
+        return (slot_list, available_list)
 
 
 # def do_all_shenanigans_and_land_on_booking_page(sb, fourD=False):
@@ -39,7 +72,7 @@ def scrape(url: str, option: str) -> dict:
 #         current_app.logger.info("NO option")
 
 
-def get_prasad_slots(sb: SB, parser: fuckOOP):
+def get_prasad_slots(sb: SB, parser: parserService):
     dih = {"available": True}
 
     while True:
@@ -60,7 +93,7 @@ def get_prasad_slots(sb: SB, parser: fuckOOP):
             else:
                 sb.cdp.click(f'//div[id="{next_date}"]')
 
-        except Exception:
-            break
+        except Exception as err:
+            current_app.logger.error(err)
 
     return dih

@@ -1,7 +1,7 @@
 from lxml.html import fromstring
 
 
-class fuckOOP:
+class parserService:
     def prasads_2d_slots(self, html_content, curr_url) -> dict:
         lxed_html = fromstring(html_content)
 
@@ -17,7 +17,7 @@ class fuckOOP:
         all_intersting_shit = lxed_html.xpath(f'//div[@class="{theatres_and_times}"]')
         shit_we_need = self.find_shit_and_return_subtree(all_intersting_shit, t_name)
 
-        available_slots = self.return_all_times(shit_we_need, time_class) if len(shit_we_need) else None
+        available_slots = self.return_all_times(shit_we_need, time_class) if shit_we_need is not None else None
         next_date = self.next_date_or_nah(lxed_html, dates_pane, active_dates_pane, curr_date)
 
         return {"slots": available_slots, "next_date": next_date}
@@ -48,3 +48,10 @@ class fuckOOP:
             if int(next_date) > curr_date:
                 return int(next_date)
         return None
+
+    def is_popular_page(self, source):
+        res = fromstring(source).xpath('//*[text()="Popular Cities"]')
+        if len(res) == 0:
+            return False
+        else:
+            return True

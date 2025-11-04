@@ -77,3 +77,62 @@ def add_notification_detail(rem_id: int, detail: dict) -> dict:
         conn.execute(
             query, {"detail": detail, "time": datetime.now(timezone.utc), "rem_id": rem_id}
         )
+
+
+def i_run_through_them_all(frequency: int) -> dict:
+
+    time_rn = datetime.now(timezone.utc)
+    delta = f"{frequency} hour"
+    query = text("SELECT * FROM user_notification WHERE  :time_rn + :delta >= last_check_time AND notification_sent = false")
+    with db.engine.connect() as conn:
+        res = conn.execute(query, {"time_rn": time_rn, "delta": delta})
+        return res.mappings().fetchall()
+    
+def update_notifications(list_of_tuples_for_tickets: list[tuple[int, dict]], list_of_tuples_for_movies: list[tuple[int, bool]]):
+    real_ones = []
+    query = text(
+        """
+            WITH updated AS (
+                UPDATE user_notification
+                SET detail = :yeah,
+                    last_check_time = NOW(),
+                    notification_sent = CASE
+                        WHEN
+                            detail != :yeah
+                        THEN
+                            true
+                        ELSE
+                            false
+                    END
+
+                WHERE rem_id = :id
+                RETURNING rem_id, detail, notification_sent
+            )
+
+            SELECT rem_id
+            FROM updated
+            WHERE notification_sent = true
+        """
+    )
+    with db.engine.connect() as conn:
+        for i in list_of_tuples_for_tickets:
+            res = conn.execute(query, {"yeah": json.dumps(i[1]), "id": i[0]})
+            real_ones.append(res.scalar())
+
+        for j in (
+            list_of_tuples_for_movies
+        ):  # there might be a good reason to not use single name variables. maybe bugs.
+            res = conn.execute(query, {"yeah": json.dumps({"available": j[1]}), "id": j[0]})
+            real_ones.append(res.scalar())
+
+        conn.commit()
+    return real_ones
+
+
+def get_notifications_by_rem_ids(rem_ids: list[int]):
+    query = text(
+        """SELECT detail, rem_id, mail_id, scrape_url FROM user_notification JOIN "user" ON user_notification.user_id = "user".id WHERE rem_id IN :rem_ids"""
+    )
+    with db.engine.connect() as conn:
+        res = conn.execute(query, {"rem_ids": tuple(rem_ids)})
+        return res.mappings().fetchall()

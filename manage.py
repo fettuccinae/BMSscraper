@@ -17,7 +17,7 @@ def runserver(host, port, debug=False):
         port=port,
         application=application,
         use_debugger=debug,
-        use_reloader=True,
+        use_reloader=debug,
         threaded=True,
     )
 

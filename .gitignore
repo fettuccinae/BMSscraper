@@ -1,3 +1,4 @@
 .env
 downloaded_files
 venv
+__pycache__/
